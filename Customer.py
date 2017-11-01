@@ -145,4 +145,8 @@ def create_oid(connection, cursor):
     # Find last order number from table and add 1, if there are any preious number, create new one
     # Format: 5-digits, start with 10000
     
-    rerurn
+    cursor.execute("SELECT max(oid) FROM orders;")
+    oid = (cursor.fetchall()) + 1
+    if oid = 1:
+        oid = 10001
+    return oid
