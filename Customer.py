@@ -130,3 +130,7 @@ def search(connection, cursor, cid):
 #Helper function for search
 def show_product_details(connection, cursor, pid):
     return
+
+#Place_Order function
+def place_order():
+    return
