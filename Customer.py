@@ -133,4 +133,16 @@ def show_product_details(connection, cursor, pid):
 
 #Place_Order function
 def place_order():
+    # Create a basket (Array or Dictionary)
+    # Ask the customer for item and qty to add into the basket, check the qty to ensure its enough
+    # Before place the order, check again for qty
+    # if qty is not met, ask if they want to change qty or delete
+    # then placed the order with an unique oid
     return
+
+#Create an Unique Order Number
+def create_oid(connection, cursor):
+    # Find last order number from table and add 1, if there are any preious number, create new one
+    # Format: 5-digits, start with 10000
+    
+    rerurn
