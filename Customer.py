@@ -3,6 +3,16 @@
 import sqlite3
 import math
 
+basket = None #a list containing tuples of (pid, sid, qty). sid is the store that the product came from
+
+def customer_main(connection, cursor, cid):
+    #A function that is called when a customer is logged in. Returns when the customer is logged out.
+    global basket
+    
+    basket = list() # initialize empty basket
+    
+    return
+
 def search(connection, cursor, cid):
     '''
     Search for products. The customer should be able to enter one or more keyword and the system should retrieve every product that match at least one of the keywords. 
@@ -93,23 +103,11 @@ def search(connection, cursor, cid):
                 numChoice = int(input())
                 undecided = False
                 if(numChoice > 0 and numChoice < 5): #Get detailed description of an item
-                    show_product_details(connection, cursor, sortedProducts[((pageNumber - 1)*5) + (numChoice - 1)]) #Show pid details
-                    undecided2 = True
-                    while undecided2:
-                        print "1. Add to basket 2. Return to previous screen"
-                        try:
-                            numChoice2 = int(input())
-                            undecided2 = False
-                            if(numChoice2 == 1): #Add to basket
-                                #add to basket function here
-                                placehodler = "help me REEEEEEEEEEEEEE" #TODO add to basket
-                            elif(numChoice2 == 2): #Return to menu
-                                pass
-                            else:
-                                print "Invalid input. Try again."
-                                undecided2 = True
-                        except ValueError:
-                            print "Invalid input. Try again."
+                    if add_to_basket(connection, cursor, cid, sortedProducts[((pageNumber - 1)*5) + (numChoice - 1)]): #Show pid details and add to basket
+                        print "Product added!"
+                    else:
+                        print "Cancelled"
+                    
                 elif(numChoice == 5): #Previous page
                     if(pageNumber > 1):
                         pageNumber -= 1
@@ -128,9 +126,12 @@ def search(connection, cursor, cid):
     return
     
 #Helper function for search
-def show_product_details(connection, cursor, pid):
+def add_to_basket(connection, cursor, cid, pid):
+    #Shows detailed description of pid and the stores that it can be bought at. If prompted, the player can choose to add the item to his basket.
+    global basket
+    
+    
     return
-
 #Place_Order function
 def place_order():
     # Create a basket (Array or Dictionary)
