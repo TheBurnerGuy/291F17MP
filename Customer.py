@@ -127,11 +127,78 @@ def search(connection, cursor, cid):
     
 #Helper function for search
 def add_to_basket(connection, cursor, cid, pid):
-    #Shows detailed description of pid and the stores that it can be bought at. If prompted, the player can choose to add the item to his basket.
+    #Shows detailed description of pid and the stores that it can be bought at. If prompted, the customer can choose to add the item to his basket and its quantity.
     global basket
+    #First query gets product id, name, unit, and category
+    query = '''SELECT pid, name, unit, cat
+    FROM products
+    WHERE pid = :pid
+    '''
+    cursor.execute(query, {"pid": pid})
+    firstQuery = cursor.fetchone()
     
+    #Second query gets the stores that carry that product and does have stock
+    query = '''SELECT stores.sid, stores.name, carries.uprice, carries.qty
+    FROM stores, carries
+    WHERE stores.sid = carries.sid
+    AND carries.pid = :pid
+    AND carries.qty > 0
+    '''
+    cursor.execute(query, {"pid": pid})
+    secondQuery = cursor.fetchall()    
     
-    return
+    #Third query gets the stores that carry the product and does not have stock
+    query = '''SELECT stores.sid, stores.name, carries.uprice, carries.qty
+    FROM stores, carries
+    WHERE stores.sid = carries.sid
+    AND carries.pid = :pid
+    AND carries.qty = 0
+    '''
+    cursor.execute(query, {"pid": pid})
+    thirdQuery = cursor.fetchall()     
+    
+    #Fourth query gets the orders that include this product within the last 7 days
+    query = '''SELECT count(DISTINCT orders.oid)
+    FROM orders, olines
+    WHERE orders.oid = olines.oid
+    AND olines.pid = :pid
+    AND date(odate, '+7 day') >= date('now')
+    '''
+    cursor.execute(query, {"pid": pid})
+    fourthQuery = cursor.fetchone()
+    
+    sorted(secondQuery, key=lambda store: store[2])
+    sorted(thirdQuery, key=lambda store: store[2])
+    sortedStores = secondQuery + thirdQuery
+    
+    #Print everything needed; pid, name, unit, cat, and orders first
+    print "Product Id: " + firstQuery[0] + ", Name: " + firstQuery[1] + ", Unit: " + firstQuery[2] + ", Category: " + firstQuery[3] + ", Orders in past week:" + fourthQuery
+    #Print all the stores that carry this product, sorted, and indexed for future decision making.
+    print "Index\tSid\tName\tPrice\tQuantity"
+    for i in range(len(sortedStores)):
+        print i + ".\t" + sortedStores[i][0] + "\t" + sortedStores[i][1] + "\t" + sortedStores[i][2] + "\t" + sortedStores[i][3]
+    active = True
+    while(active):
+        print "Select a store by index to add the product to your basket. To go back, enter 'q'."
+        choice = input()
+        if choice == 'q':
+            active = False
+        else:
+            try:
+                choice = int(choice)
+                if choice >= 0 and choice < len(sortedStores):
+                    quantity = int(input("Enter quantity: "))
+                    if quantity <= int(sortedStores[choice][3]):
+                        basket.append((pid, sortedStores[choice][0], quantity)) #Store (pid, sid, qty)
+                        return True                        
+                    else:
+                        print "Incorrect input. Try again."
+                else:
+                    print "Incorrect input. Try again."
+            except ValueError:
+                print "Incorrect input. Try again."
+    
+    return False
 #Place_Order function
 def place_order():
     # Create a basket (Array or Dictionary)
