@@ -66,7 +66,7 @@ def search(connection, cursor, cid):
             query = '''SELECT products.pid, products.name, products.unit, count(carries.sid), min(carries.uprice)
             FROM products left outer join carries using (pid)
             WHERE products.pid = :pid
-            GROUP BY products.pid, products.name, products.unit
+            GROUP BY products.pid, products.name, products.unit;
             '''
             cursor.execute(query, {"pid": sortedProducts[i]})
             firstQuery = cursor.fetchone()
@@ -76,7 +76,7 @@ def search(connection, cursor, cid):
             FROM products left outer join carries using (pid)
             WHERE products.pid = :pid
             AND qty > 0
-            GROUP BY products.pid
+            GROUP BY products.pid;
             '''
             cursor.execute(query, {"pid": sortedProducts[i]})
             secondQuery = cursor.fetchone()
@@ -86,7 +86,7 @@ def search(connection, cursor, cid):
             FROM orders, olines
             WHERE orders.oid = olines.oid
             AND olines.pid = :pid
-            AND date(odate, '+7 day') >= date('now')
+            AND date(odate, '+7 day') >= date('now');
             '''
             cursor.execute(query, {"pid": sortedProducts[i]})
             thirdQuery = cursor.fetchone()
@@ -132,7 +132,7 @@ def add_to_basket(connection, cursor, cid, pid):
     #First query gets product id, name, unit, and category
     query = '''SELECT pid, name, unit, cat
     FROM products
-    WHERE pid = :pid
+    WHERE pid = :pid;
     '''
     cursor.execute(query, {"pid": pid})
     firstQuery = cursor.fetchone()
@@ -142,7 +142,7 @@ def add_to_basket(connection, cursor, cid, pid):
     FROM stores, carries
     WHERE stores.sid = carries.sid
     AND carries.pid = :pid
-    AND carries.qty > 0
+    AND carries.qty > 0;
     '''
     cursor.execute(query, {"pid": pid})
     secondQuery = cursor.fetchall()    
@@ -152,7 +152,7 @@ def add_to_basket(connection, cursor, cid, pid):
     FROM stores, carries
     WHERE stores.sid = carries.sid
     AND carries.pid = :pid
-    AND carries.qty = 0
+    AND carries.qty = 0;
     '''
     cursor.execute(query, {"pid": pid})
     thirdQuery = cursor.fetchall()     
@@ -162,7 +162,7 @@ def add_to_basket(connection, cursor, cid, pid):
     FROM orders, olines
     WHERE orders.oid = olines.oid
     AND olines.pid = :pid
-    AND date(odate, '+7 day') >= date('now')
+    AND date(odate, '+7 day') >= date('now');
     '''
     cursor.execute(query, {"pid": pid})
     fourthQuery = cursor.fetchone()
@@ -189,8 +189,8 @@ def add_to_basket(connection, cursor, cid, pid):
                 if choice >= 0 and choice < len(sortedStores):
                     quantity = int(input("Enter quantity: "))
                     if quantity <= int(sortedStores[choice][3]):
-                        basket.append((pid, sortedStores[choice][0], quantity)) #Store (pid, sid, qty)
-                        return True                        
+                        basket.append((pid, sortedStores[choice][0], quantity)) #Store (pid, sid, qty) in basket
+                        return True                                          
                     else:
                         print "Incorrect input. Try again."
                 else:
@@ -215,6 +215,6 @@ def create_oid(connection, cursor):
     
     cursor.execute("SELECT max(oid) FROM orders;")
     oid = (cursor.fetchall()) + 1
-    if oid = 1:
+    if oid == 1:
         oid = 10001
     return oid
