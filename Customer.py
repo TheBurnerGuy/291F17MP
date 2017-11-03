@@ -8,8 +8,25 @@ basket = None #a list containing tuples of (pid, sid, qty). sid is the store tha
 def customer_main(connection, cursor, cid):
     #A function that is called when a customer is logged in. Returns when the customer is logged out.
     global basket
-    
     basket = list() # initialize empty basket
+    
+    logged_in = True
+    while(logged_in):
+        print "1. Search for products"
+        print "2. Place an order"
+        print "3. List orders"
+        print "Select an option or enter 'q' to log out."
+        choice = input()
+        if choice == "q":
+            logged_in = False
+        elif choice == "1":
+            search(connection, cursor, cid)
+        elif choice == "2":
+            pass #Insert place an order function here
+        elif choice == "3":
+            pass #Insert list order function here
+        else:
+            print "Invalid input. Try again."
     
     return
 
