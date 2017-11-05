@@ -24,7 +24,7 @@ def customer_main(connection, cursor, cid):
         elif choice == "2":
             pass #Insert place an order function here
         elif choice == "3":
-            pass #Insert list order function here
+            list_order(connection, cursor, cid)
         else:
             print "Invalid input. Try again."
     
@@ -235,3 +235,20 @@ def create_oid(connection, cursor):
     if oid == 1:
         oid = 10001
     return oid
+
+
+def list_order(connection, cursor, cid):
+    ''' 
+    List orders. The customer should be able to see all his/her orders; 
+    the listing should include for each order, the order id, order date, the number of products ordered and the total price; 
+    the orders should be listed in a sorted order with more recent orders listed first. 
+    If there are more than 5 orders, only 5 would be shown and the user would be given an option to see more but again 5 at a time. 
+    The user should be able to select an order and see more detail of the order including delivery information such as tracking number, 
+    pick up and drop off times, the address to be delivered, and a listing of the products in the order, 
+    which will include for each product the store id, the store name, the product id, the product name, quantity, unit and unit price.
+    '''
+    
+    print "Listing orders:"
+    
+    return
+    
