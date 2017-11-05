@@ -1,6 +1,7 @@
 #Temporary Login File
 
 import sqlite3
+import sys
 import time
 import hashlib
 import Customer
@@ -85,18 +86,19 @@ def customer_register():
     return
 
 def customer():
-    #Insert implementation of customer
+    #Implementation of customer class
+    global lid
+    Customer.customer_main(connection, cursor, lid)
     return
     
 def agent():
     #Insert implementation of agent
     return
 
-def main():
+def main(path):
     global connection, cursor, lid
 
-    path="./register.db"
-    connect(path)
+    connect(path) #path = ./register.db
     #connection.create_function('GPA', 1, GPA)
 
     #tables should be defined already in register.db
@@ -130,4 +132,8 @@ def main():
     return
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1: # Database name is given
+        path = str(sys.argv[1]) # Use second argument
+    else:
+        path = "./register.db"
+    main(path)
