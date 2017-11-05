@@ -247,8 +247,28 @@ def list_order(connection, cursor, cid):
     pick up and drop off times, the address to be delivered, and a listing of the products in the order, 
     which will include for each product the store id, the store name, the product id, the product name, quantity, unit and unit price.
     '''
+    # Listing Orders - Order by Most recent (Descending order in oid)
     
-    print "Listing orders:"
+    query = '''SELECT oid
+    FROM orders
+    WHERE pid = :pid
+    ORDER BY oid DESC;
+    '''
+    cursor.execute(query, {"pid": pid})
+    # orderList will contain all the oid with the same 
+    orderList = cursor.fetchall()
+    
+    # No order is placed by the customer
+    if len(orderList) == 0:
+        print "There is no order placed. Returning to main menu."
+        return
+    
+    # List the orders, 5 at a time
+    # Format: Order Id, Order Date, Number of product ordered, Total Price
+    
+    active = True
+    pageNumber = 1
+    while(active):
     
     return
     
