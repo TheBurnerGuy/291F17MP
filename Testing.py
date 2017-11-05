@@ -128,35 +128,50 @@ def insert_data():
                        '''
                        
     insert_products =  '''
-                        INSERT INTO student(student_id, name) VALUES
-                                (1509106, 'Saeed'),
-                                (1409106, 'Alex'),
-                                (1609106, 'Mike');
+                        INSERT INTO products(pid, name, unit, cat) VALUES
+                                ("p1", "Chicken Breast", "kg", "mea"),
+                                ("p2", "Chicken Leg", "kg", "mea"),
+                                ("p3", "Beef", "kg", "mea"),
+                                ("p4", "Pork", "kg", "mea"),
+                                ("p5", "Orange", "kg", "fav"),
+                                ("p6", "Apple", "kg", "fav"),
+                                ("p7", "Banana", "kg", "fav"),
+                                ("p8", "Dark Souls 1", "kg", "gam"),
+                                ("p9", "Dark Souls 2", "kg", "gam"),
+                                ("p10", "Demon Souls", "kg", "gam"),
+                                ("p11", "Minecraft Pickaxe", "kg", "toy")
+                                ("p12", "Chicken Thigh", "kg", "mea"),;
                        '''
                        
     insert_carries =  '''
-                        INSERT INTO student(student_id, name) VALUES
-                                (1509106, 'Saeed'),
-                                (1409106, 'Alex'),
-                                (1609106, 'Mike');
+                        INSERT INTO carries(sid, pid, qty, uprice) VALUES
+                                (1, "p1", 10, 5.99),
+                                (1, "p2", 10, 4.99),
+                                (1, "p12", 10, 7.99),
+                                (2, "p1", 0, 4.99),
+                                (2, "p2", 10, 5.99),
+                                (2, "p12", 10, 6.99),
+                                (5, "p1", 5, 5.99),
+                                (5, "p2", 0, 4.50),
+                                (5, "p12", 0, 7.50);
                        '''
                        
     insert_customers =  '''
-                        INSERT INTO student(student_id, name) VALUES
-                                (1509106, 'Saeed'),
-                                (1409106, 'Alex'),
-                                (1609106, 'Mike');
+                        INSERT INTO customers(cid, name, address, pwd) VALUES
+                                ('101', 'Henry', 'Somewhere', 'water'),
+                                ('102', 'Calvin', 'Somewhere', 'jodan'),
+                                ('103', 'Jordan', 'Somewhere', 'kelvin');
                        '''
                        
     insert_orders =  '''
-                        INSERT INTO student(student_id, name) VALUES
-                                (1509106, 'Saeed'),
-                                (1409106, 'Alex'),
-                                (1609106, 'Mike');
+                        INSERT INTO orders(oid, cid, odate, address) VALUES
+                                (10000, '101', datetime('now'), 'Somewhere'),
+                                (10001, '101', datetime('now'), 'Somewhere'),
+                                (10002, '102', datetime('now', '-14 days'), 'Somewhere');
                        '''
                        
     insert_olines =  '''
-                        INSERT INTO student(student_id, name) VALUES
+                        INSERT INTO students(student_id, name) VALUES
                                 (1509106, 'Saeed'),
                                 (1409106, 'Alex'),
                                 (1609106, 'Mike');
@@ -171,6 +186,11 @@ def insert_data():
 
     cursor.execute(insert_agents)
     cursor.execute(insert_stores)
+    cursor.execute(insert_categories)
+    cursor.execute(insert_products)
+    cursor.execute(insert_carries)
+    cursor.execute(insert_customers)
+    cursor.execute(insert_orders)
     
     #Insert other cursor.execute statements when finished
     
