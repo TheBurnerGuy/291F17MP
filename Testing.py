@@ -112,7 +112,7 @@ def insert_data():
                                 (1, 'Walmart', '7809119111', 'New York'),
                                 (2, 'Superstore', '7808118111', 'Old York'),
                                 (3, 'EB Games', '7807117111', 'Newfoundland'),
-                                (4, 'Shoppers Drug Mart', '7806116111', 'Oldfoundland')
+                                (4, 'Shoppers Drug Mart', '7806116111', 'Oldfoundland'),
                                 (5, 'Sobeys', '7805115111', 'New Town'),
                                 (6, 'Sears', '7804114111', 'Old Town');
                        '''
@@ -139,8 +139,8 @@ def insert_data():
                                 ("p8", "Dark Souls 1", "kg", "gam"),
                                 ("p9", "Dark Souls 2", "kg", "gam"),
                                 ("p10", "Demon Souls", "kg", "gam"),
-                                ("p11", "Minecraft Pickaxe", "kg", "toy")
-                                ("p12", "Chicken Thigh", "kg", "mea"),;
+                                ("p11", "Minecraft Pickaxe", "kg", "toy"),
+                                ("p12", "Chicken Thigh", "kg", "mea");
                        '''
                        
     insert_carries =  '''
@@ -260,7 +260,6 @@ def main(path):
 
     define_tables()
     insert_data()
-    
 
     connection.commit()
     connection.close()
