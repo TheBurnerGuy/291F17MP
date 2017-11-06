@@ -70,8 +70,6 @@ def search(connection, cursor, cid):
     #Order it based on products
     sortedProducts = sorted(productCount, key=lambda pid: productCount[pid], reverse=True)
     
-    print(sortedProducts)
-    
     #Find the product's data for each product. List 5 at once.
     active = True
     pageNumber = 1

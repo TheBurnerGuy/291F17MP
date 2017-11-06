@@ -84,3 +84,31 @@ def setup(connection, cursor):
             except ValueError:
                 print ("Invalid input. Try again.")
     return
+
+def update(connection, cursor):
+    #get a tracking number
+    trackingNo = None
+    try:
+        trackingNo = int(input("Enter tracking number: "))
+        query = '''SELECT * FROM deliveries WHERE trackingNo = :trackingNo
+        '''
+        cursor.execute(query, {"trackingNo": trackingNo})
+    except ValueError:
+        print ("Invalid Input. Returning to menu.")
+        return
+    
+    #show pickup time
+    delivery = cursor.fetchone()
+    print ("Current pick up time: " + str(delivery[2]))
+    print ("Current drop off time: " + str(delivery[3]))
+    
+    #allow agent to change pickup /drop off time or remove order
+    active = True
+    while(active):
+        active = False
+        decision = input("Enter '1' or")
+    return
+
+def add_to_stock(connection,cursor):
+    #unfinished
+    return
