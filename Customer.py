@@ -217,12 +217,18 @@ def add_to_basket(connection, cursor, cid, pid):
     
     return False
 #Place_Order function
-def place_order():
+def place_order(connection, curosr, basket):
     # Create a basket (Array or Dictionary)
+    basket = {}
     # Ask the customer for item and qty to add into the basket, check the qty to ensure its enough
+    item = input('Item and Qty: ')
+    # query to get for qty 
+    basket.append(item)
     # Before place the order, check again for qty
     # if qty is not met, ask if they want to change qty or delete
+    # if query_qty is not <= qty prompt the delete
     # then placed the order with an unique oid
+    # use def creat_oid()
     return
 
 #Create an Unique Order Number
