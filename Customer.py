@@ -223,7 +223,7 @@ def place_order(connection, cursor, cid):
     global basket
     # Ask the customer for item and qty to add into the basket, check the qty to ensure its enough
     # query to get for qty 
-    cursor.execute('SELECT qty FROM carries c WHERE c.pid = ? AND c.sid AND ? AND c.qty <= ?;', basket)
+    cursor.execute('SELECT qty FROM carries c WHERE c.pid = ? AND c.sid = ? AND c.qty <= ?;', basket)
     
     store_carries = cursor.fetchall()
     
