@@ -252,7 +252,8 @@ def place_order(connection, cursor, cid):
             sid = i[1]
             pid = i[0]
             qty = i[2]
-            uprice = i[3]
+            cursor.execute('SELECT carries.uprice FROM carries WHERE sid = :sid AND pid = :pid;')
+	    uprice = fetchone()
             oline_data = (oid, sid, pid, qty, uprice) 
             if (firstTime):
                 firstTime = False
