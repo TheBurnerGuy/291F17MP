@@ -53,9 +53,11 @@ def search(connection, cursor, cid):
     listOfMatches = list()
     i = 0
     for term in searchTerms:
-        cursor.execute("SELECT pid FROM products WHERE name LIKE '%:term%'",{"term": term})
-        listOfMatches[i] = cursor.fetchall()
-        i += 1
+        cursor.execute("SELECT pid FROM products WHERE name LIKE '%:term%';",{"term": term.strip()})
+        listOfMatches.append(cursor.fetchall())
+    
+    #Test Print
+    print(listOfMatches)    
     
     #Count the products for each matching term
     productCount = dict()
@@ -139,7 +141,6 @@ def search(connection, cursor, cid):
             except ValueError:
                 print ("Invalid input. Try again.")
                 
-    cursor.execute()
     return
     
 #Helper function for search
