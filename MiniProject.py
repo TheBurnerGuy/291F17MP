@@ -83,6 +83,8 @@ def customer_register():
     connection.commit()
     print "Registration successful!"
     
+    lid = cid
+    
     return
 
 def customer():
@@ -93,6 +95,8 @@ def customer():
     
 def agent():
     #Insert implementation of agent
+    global lid
+    Agent.agent_main(connection, cursor, lid)
     return
 
 def main(path):

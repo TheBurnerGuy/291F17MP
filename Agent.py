@@ -2,6 +2,29 @@
 import numpy.random as rnd
 import datetime
 
+def agent_main(connection, cursor, aid):
+    #A function that is called when an agent is logged in. Returns when the agent is logged out.
+    
+    logged_in = True
+    while(logged_in):
+        print "1. Set up a delivery"
+        print "2. Update a delivery"
+        print "3. Add to stock"
+        print "Select an option or enter 'q' to log out."
+        choice = input()
+        if choice == "q":
+            logged_in = False
+        elif choice == "1":
+            setup(connection, cursor)
+        elif choice == "2":
+            pass #Insert update a delivery function here
+        elif choice == "3":
+            pass #Insert add to stock function here
+        else:
+            print "Invalid input. Try again."
+    
+    return
+
 def setup(connection, cursor):
     #Algorithm: Show a list of orders. If an agent choose a order, ask them for the pickUpTime. After choosing an order, the agent is allowed to choose another order to input 'q' to finalize the delivery.
     #Generate a unique trackingNo

@@ -255,7 +255,8 @@ def insert_data():
 
 def main(path):
     global connection, cursor
-
+    
+    print "Creating a database at: " + path
     connect(path)
 
     define_tables()
@@ -263,6 +264,7 @@ def main(path):
 
     connection.commit()
     connection.close()
+    print "Done"
     return
 
 if __name__ == "__main__":
