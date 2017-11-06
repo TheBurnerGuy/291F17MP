@@ -2,6 +2,7 @@
 
 import sqlite3
 import math
+import time
 
 basket = None #a list containing tuples of (pid, sid, qty). sid is the store that the product came from
 
@@ -12,6 +13,7 @@ def customer_main(connection, cursor, cid):
     
     logged_in = True
     while(logged_in):
+        print("Current Basket: " + str(basket))
         print ("1. Search for products")
         print ("2. Place an order")
         print ("3. List orders")
@@ -51,13 +53,10 @@ def search(connection, cursor, cid):
     #Make a list for each term containing products that have the keyword in the product name
     #Store the list into a bigger list called listOfMatches
     listOfMatches = list()
-    i = 0
     for term in searchTerms:
-        cursor.execute("SELECT pid FROM products WHERE name LIKE '%:term%';",{"term": term.strip()})
-        listOfMatches.append(cursor.fetchall())
-    
-    #Test Print
-    print(listOfMatches)    
+        query = "SELECT pid FROM products WHERE name LIKE '%4L%';"
+        cursor.execute(query, {"thing": term.strip()})
+        listOfMatches.append(cursor.fetchall())  
     
     #Count the products for each matching term
     productCount = dict()
@@ -71,12 +70,14 @@ def search(connection, cursor, cid):
     #Order it based on products
     sortedProducts = sorted(productCount, key=lambda pid: productCount[pid], reverse=True)
     
+    print(sortedProducts)
+    
     #Find the product's data for each product. List 5 at once.
     active = True
     pageNumber = 1
     while(active):
         indexNumber = 0
-        print("Num\tPID\tName\tUnit\t# of stores that carry\t# of stores in stock\tMin price for stores\tMin price for stores with stock\tOrders in past week")
+        print("Num\tPID\tName\tUnit\t# of s carries \t# of s in stock\tMin price\tMin price in stock\tOrders in past week")
         for i in range((pageNumber-1)*5,min((pageNumber*5)-1, len(sortedProducts))):
             
             indexNumber += 1
@@ -87,7 +88,7 @@ def search(connection, cursor, cid):
             WHERE products.pid = :pid
             GROUP BY products.pid, products.name, products.unit;
             '''
-            cursor.execute(query, {"pid": sortedProducts[i]})
+            cursor.execute(query, {"pid": sortedProducts[i][0]})
             firstQuery = cursor.fetchone()
         
             #Second query gets number of stores that carry have it in stock, and minimum price of stores that have it in stock
@@ -97,7 +98,7 @@ def search(connection, cursor, cid):
             AND qty > 0
             GROUP BY products.pid;
             '''
-            cursor.execute(query, {"pid": sortedProducts[i]})
+            cursor.execute(query, {"pid": sortedProducts[i][0]})
             secondQuery = cursor.fetchone()
         
             #Third query gets number or orders for the product
@@ -107,11 +108,11 @@ def search(connection, cursor, cid):
             AND olines.pid = :pid
             AND date(odate, '+7 day') >= date('now');
             '''
-            cursor.execute(query, {"pid": sortedProducts[i]})
+            cursor.execute(query, {"pid": sortedProducts[i][0]})
             thirdQuery = cursor.fetchone()
             
-            print (str(indexNumber) + ".\t" + firstQuery[0] + "\t" + firstQuery[1] + "\t" + firstQuery[2] + "\t" + firstQuery[3] 
-            + "\t" + secondQuery[0] + "\t" + firstQuery[4] + "\t" + secondQuery[1] + "\t" + thirdQuery[0])
+            print (str(indexNumber) + ".\t" + str(firstQuery[0]) + "\t" + str(firstQuery[1]) + "\t" + str(firstQuery[2]) + "\t" + str(firstQuery[3]) + "\t" + str(secondQuery[0]) + "\t" + str(firstQuery[4]) + "\t" + str(secondQuery[1]) + "\t" + str(thirdQuery[0]))
+        
         
         print ("5. Previous Page 6. Next Page 7. Return to menu")
         
@@ -122,7 +123,7 @@ def search(connection, cursor, cid):
                 numChoice = int(input())
                 undecided = False
                 if(numChoice > 0 and numChoice < 5): #Get detailed description of an item
-                    if add_to_basket(connection, cursor, cid, sortedProducts[((pageNumber - 1)*5) + (numChoice - 1)]): #Show pid details and add to basket
+                    if add_to_basket(connection, cursor, cid, sortedProducts[((pageNumber - 1)*5) + (numChoice - 1)][0]): #Show pid details and add to basket
                         print ("Product added!")
                     else:
                         print ("Cancelled")
@@ -190,11 +191,11 @@ def add_to_basket(connection, cursor, cid, pid):
     sortedStores = secondQuery + thirdQuery
     
     #Print everything needed; pid, name, unit, cat, and orders first
-    print ("Product Id: " + firstQuery[0] + ", Name: " + firstQuery[1] + ", Unit: " + firstQuery[2] + ", Category: " + firstQuery[3] + ", Orders in past week:" + fourthQuery)
+    print ("Product Id: " + str(firstQuery[0]) + ", Name: " + str(firstQuery[1]) + ", Unit: " + str(firstQuery[2]) + ", Category: " + str(firstQuery[3]) + ", Orders in past week:" + str(fourthQuery[0]))
     #Print all the stores that carry this product, sorted, and indexed for future decision making.
     print ("Index\tSid\tName\tPrice\tQuantity")
     for i in range(len(sortedStores)):
-        print (i + ".\t" + sortedStores[i][0] + "\t" + sortedStores[i][1] + "\t" + sortedStores[i][2] + "\t" + sortedStores[i][3])
+        print (str(i) + ".\t" + str(sortedStores[i][0]) + "\t" + str(sortedStores[i][1]) + "\t" + str(sortedStores[i][2]) + "\t" + str(sortedStores[i][3]))
     active = True
     while(active):
         print ("Select a store by index to add the product to your basket. To go back, enter 'q'.")
@@ -217,6 +218,7 @@ def add_to_basket(connection, cursor, cid, pid):
                 print ("Incorrect input. Try again.")
     
     return False
+
 #Place_Order function
 def place_order(connection, curosr, basket):
     # Create a basket (Array or Dictionary)
@@ -336,7 +338,7 @@ def list_order(connection, cursor, cid):
     return
     
     # Helper function for Listing
-    def list_detail(connection, cursor, cid, oid):
+def list_detail(connection, cursor, cid, oid):
         # Displays Delivery Infromation: Tracking Number, Pick Up Time, and Drop Off Time
         # Also, A list of products in the Order, with its: Store ID, Product ID, Quantity, Unit, and Unit Price
         
