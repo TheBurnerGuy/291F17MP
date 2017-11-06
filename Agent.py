@@ -19,7 +19,7 @@ def agent_main(connection, cursor, aid):
         elif choice == "2":
             pass #Insert update a delivery function here
         elif choice == "3":
-            pass #Insert add to stock function here
+            add_to_stock(connection, cursor)
         else:
             print ("Invalid input. Try again.")
     
@@ -109,6 +109,63 @@ def update(connection, cursor):
         decision = input("Enter '1' or")
     return
 
-def add_to_stock(connection,cursor):
-    #unfinished
+def add_to_stock(connection, cursor):
+    # An agent should be able to select a product and a store (by giving the product id and the store id) and give the number of products to be added to the stock. The agent should have the option to change the unit price.
+    
+    pid = None
+    sid = None
+    
+    try:
+        pid = str(input("Enter the Product ID: "))
+        sid = int(input("Enter the Store ID: "))
+        info = {"pid":pid, "sid":sid}
+        query = '''SELECT * FROM carries WHERE pid = :pid AND sid = :sid;
+        '''
+        cursor.execute(query, info)
+        
+    except:
+        print ("Invalid Input. Returning to menu.")
+        return
+    
+    # Display current info
+    add = cursor.fetchone()
+    print("Current quantity is: " + str(add[2]))
+    print("Current unit price is: " + str(add[3]))
+    
+    active = True
+    while(active):
+        active = False
+        
+        # Update quantity
+        try:
+            qty = int(input("Enter new quantity: "))
+            info = {"qty":qty, "pid":pid, "sid":sid}
+  
+            query = '''UPDATE carries
+            SET qty = :qty
+            WHERE pid = :pid AND sid = :sid;
+            '''
+            cursor.execute(query, info)
+            print("Quantity Updated")
+            
+            # Option for update unit price
+            
+            decision = input("Would you like to change the unit price? (Y/N) ")
+            
+            if (decision == "Y"):
+                uprice = float(input("Enter new unit price: "))
+                info = {"uprice":uprice, "pid":pid, "sid":sid}
+                query = '''UPDATE carries
+                SET uprice = :uprice
+                WHERE pid = :pid AND sid = :sid;
+                '''
+                cursor.execute(query, info)
+                print("Unit price Updated")
+            else:
+                return
+            
+        except:
+            print ("Invalid Input. Returning to menu.")
+            return            
+    
     return
