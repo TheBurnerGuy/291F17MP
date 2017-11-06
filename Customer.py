@@ -220,43 +220,49 @@ def add_to_basket(connection, cursor, cid, pid):
 def place_order(connection, cursor, cid):
     global basket
     # Ask the customer for item and qty to add into the basket, check the qty to ensure its enough
-    # query to get for qty 
-    cursor.execute('SELECT qty FROM carries c WHERE c.pid = ? AND c.sid = ? AND c.qty <= ?;', basket)
     
-    store_carries = cursor.fetchall()
+    # query to get for qty
+    
+    store_carries = list()
+    for k in range(len(basket)):
+        cursor.execute('SELECT qty FROM carries c WHERE c.pid = :pid AND c.sid = :sid ;', {"pid": basket[k][0], "sid": basket[k][1]})
+        store_carries.append(cursor.fetchone()) 
     
     # Before place the order, check again for qty
     # if qty is not met, ask if they want to change qty or delete
     firstTime = True
+    print(basket)
+    print(store_carries)
     for i in basket:
         for j in store_carries:
-            if basket[i][2] > j:
+            print("I'm doing the thing" + str(i) + str(j))
+            if i[2] > j[0]:
                 delete = input('Do you want to change the qty[c] or delete[d]: ')
                 if delete == 'd':
-                    del basket[i]
+                    basket.remove[i]
                 elif delete == 'c':
                     change = input('What is your new qty: ')
-                    basket[i][2] = change
+                    i[2] = change
                     
-            else:
-                oid = create_oid()
-                odate = time.strftime("%Y-%m-%d %H:%M:%S")
-                address_query = cursor.execute('SELECT address FROM customers c, orders c WHERE c.cid = o.cid;')
-                data = (oid, cid, odate, address_query)
-                sid = basket[i][1]
-                pid = basket[i][0]
-                qty = basket[i][2]
-                uprice = basket[i][3]
-                oline_data = (oid, sid, pid, qty, uprice) 
-                if (firstTime):
-                    firstTime = False
-                    cursor.execute('INSERT INTO order VALUES (?,?,?,?);', data)
-                cursor.execute('INSERT INTO olines VALUES (?,?,?,?,?);', oline_data)
+            
+            oid = create_oid(connection, cursor)
+            odate = time.strftime("%Y-%m-%d %H:%M:%S")
+            address_query = cursor.execute('SELECT c.address FROM customers c WHERE c.cid = cid', {"cid": cid})
+            data = (oid, cid, odate, address_query)
+            sid = i[1]
+            pid = i[0]
+            qty = i[2]
+            uprice = i[3]
+            oline_data = (oid, sid, pid, qty, uprice) 
+            if (firstTime):
+                firstTime = False
+                cursor.execute('INSERT INTO order VALUES (?,?,?,?);', data)
+            cursor.execute('INSERT INTO olines VALUES (?,?,?,?,?);', oline_data)
                 
     # if query_qty is not <= qty prompt the delete
     # then placed the order with an unique oid
     # use def creat_oid()
-    
+    print ("Order created!")
 	
     connection.commit()
     return
