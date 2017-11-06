@@ -12,10 +12,10 @@ def customer_main(connection, cursor, cid):
     
     logged_in = True
     while(logged_in):
-        print "1. Search for products"
-        print "2. Place an order"
-        print "3. List orders"
-        print "Select an option or enter 'q' to log out."
+        print ("1. Search for products")
+        print ("2. Place an order")
+        print ("3. List orders")
+        print ("Select an option or enter 'q' to log out.")
         choice = input()
         if choice == "q":
             logged_in = False
@@ -26,7 +26,7 @@ def customer_main(connection, cursor, cid):
         elif choice == "3":
             list_order(connection, cursor, cid)
         else:
-            print "Invalid input. Try again."
+            print ("Invalid input. Try again.")
     
     return
 
@@ -45,7 +45,7 @@ def search(connection, cursor, cid):
     after the customer logs out or places an order.
     '''
     
-    print "Enter keywords:"
+    print ("Enter keywords:")
     searchTerms = input().split()
     
     #Make a list for each term containing products that have the keyword in the product name
@@ -74,7 +74,7 @@ def search(connection, cursor, cid):
     pageNumber = 1
     while(active):
         indexNumber = 0
-        print "Num\tPID\tName\tUnit\t# of stores that carry\t# of stores in stock\tMin price for stores\tMin price for stores with stock\tOrders in past week"
+        print("Num\tPID\tName\tUnit\t# of stores that carry\t# of stores in stock\tMin price for stores\tMin price for stores with stock\tOrders in past week")
         for i in range((pageNumber-1)*5,min((pageNumber*5)-1, len(sortedProducts))):
             
             indexNumber += 1
@@ -108,10 +108,10 @@ def search(connection, cursor, cid):
             cursor.execute(query, {"pid": sortedProducts[i]})
             thirdQuery = cursor.fetchone()
             
-            print str(indexNumber) + ".\t" + firstQuery[0] + "\t" + firstQuery[1] + "\t" + firstQuery[2] + "\t" + firstQuery[3] 
-            + "\t" + secondQuery[0] + "\t" + firstQuery[4] + "\t" + secondQuery[1] + "\t" + thirdQuery[0]
+            print (str(indexNumber) + ".\t" + firstQuery[0] + "\t" + firstQuery[1] + "\t" + firstQuery[2] + "\t" + firstQuery[3] 
+            + "\t" + secondQuery[0] + "\t" + firstQuery[4] + "\t" + secondQuery[1] + "\t" + thirdQuery[0])
         
-        print "5. Previous Page 6. Next Page 7. Return to menu"
+        print ("5. Previous Page 6. Next Page 7. Return to menu")
         
         #Choice branch
         undecided = True
@@ -121,9 +121,9 @@ def search(connection, cursor, cid):
                 undecided = False
                 if(numChoice > 0 and numChoice < 5): #Get detailed description of an item
                     if add_to_basket(connection, cursor, cid, sortedProducts[((pageNumber - 1)*5) + (numChoice - 1)]): #Show pid details and add to basket
-                        print "Product added!"
+                        print ("Product added!")
                     else:
-                        print "Cancelled"
+                        print ("Cancelled")
                     
                 elif(numChoice == 5): #Previous page
                     if(pageNumber > 1):
@@ -134,10 +134,10 @@ def search(connection, cursor, cid):
                 elif(numChoice == 7): #Go back to menu
                     active = False
                 else:
-                    print "Invalid input. Try again."
+                    print ("Invalid input. Try again.")
                     undecided = True
             except ValueError:
-                print "Invalid input. Try again."
+                print ("Invalid input. Try again.")
                 
     cursor.execute()
     return
@@ -189,14 +189,14 @@ def add_to_basket(connection, cursor, cid, pid):
     sortedStores = secondQuery + thirdQuery
     
     #Print everything needed; pid, name, unit, cat, and orders first
-    print "Product Id: " + firstQuery[0] + ", Name: " + firstQuery[1] + ", Unit: " + firstQuery[2] + ", Category: " + firstQuery[3] + ", Orders in past week:" + fourthQuery
+    print ("Product Id: " + firstQuery[0] + ", Name: " + firstQuery[1] + ", Unit: " + firstQuery[2] + ", Category: " + firstQuery[3] + ", Orders in past week:" + fourthQuery)
     #Print all the stores that carry this product, sorted, and indexed for future decision making.
-    print "Index\tSid\tName\tPrice\tQuantity"
+    print ("Index\tSid\tName\tPrice\tQuantity")
     for i in range(len(sortedStores)):
-        print i + ".\t" + sortedStores[i][0] + "\t" + sortedStores[i][1] + "\t" + sortedStores[i][2] + "\t" + sortedStores[i][3]
+        print (i + ".\t" + sortedStores[i][0] + "\t" + sortedStores[i][1] + "\t" + sortedStores[i][2] + "\t" + sortedStores[i][3])
     active = True
     while(active):
-        print "Select a store by index to add the product to your basket. To go back, enter 'q'."
+        print ("Select a store by index to add the product to your basket. To go back, enter 'q'.")
         choice = input()
         if choice == 'q':
             active = False
@@ -209,11 +209,11 @@ def add_to_basket(connection, cursor, cid, pid):
                         basket.append((pid, sortedStores[choice][0], quantity)) #Store (pid, sid, qty) in basket
                         return True                                          
                     else:
-                        print "Incorrect input. Try again."
+                        print ("Incorrect input. Try again.")
                 else:
-                    print "Incorrect input. Try again."
+                    print ("Incorrect input. Try again.")
             except ValueError:
-                print "Incorrect input. Try again."
+                print ("Incorrect input. Try again.")
     
     return False
 #Place_Order function
@@ -266,7 +266,7 @@ def list_order(connection, cursor, cid):
     
     # No order is placed by the customer
     if len(orderList) == 0:
-        print "There is no order placed. Returning to main menu."
+        print ("There is no order placed. Returning to main menu.")
         return
     
     # List the orders, 5 at a time
@@ -276,7 +276,7 @@ def list_order(connection, cursor, cid):
     pageNumber = 1
     while(active):
         indexNumber = 0
-        print "Order ID\tOrder Date\tNumber of Product\tTotal Price"
+        print ("Order ID\tOrder Date\tNumber of Product\tTotal Price")
         for i in range((pageNumber-1)*5,min((pageNumber*5)-1, len(orderList))):
             indexNumber += 1
             
@@ -296,18 +296,18 @@ def list_order(connection, cursor, cid):
             cursor.execute(query, {"oid": orderList[i]})
             secondQuery = cursor.fetchone()
             
-            print str(indexNumber) + ".\t" + firstQuery[0] + "\t" + firstQuery[1] + "\t" + firstQuery[2] + "\t" + secondQuery[0] + "\t" + secondQuery[1]
+            print (str(indexNumber) + ".\t" + firstQuery[0] + "\t" + firstQuery[1] + "\t" + firstQuery[2] + "\t" + secondQuery[0] + "\t" + secondQuery[1])
         
         # Display options based on page number
         # pageStat: Indicate page based on following condition
-        if pageNumber = 1:
-            print "6. Next Page 7. Return to Menu"
+        if pageNumber == 1:
+            print ("6. Next Page 7. Return to Menu")
             pageStat = 1
-        elif pageNumber = (len(orderList)/5):
-            print "5. Previous Page 7. Return to Menu"
+        elif pageNumber == len(orderList)//5:
+            print ("5. Previous Page 7. Return to Menu")
             pageStat = 3
         else:
-            print "5. Previous Page 6. Next Page 7. Return to menu"
+            print ("5. Previous Page 6. Next Page 7. Return to menu")
             pageStat = 2
         
         # Chioce Branch
@@ -326,10 +326,10 @@ def list_order(connection, cursor, cid):
                 elif(numChoice == 7): # Go back to menu
                     active = False
                 else:
-                    print "Invalid input. Try again."
+                    print ("Invalid input. Try again.")
                     undecided = True
             except ValueError:
-                print "Invalid input. Try again."
+                print ("Invalid input. Try again.")
                 
     cursor.execute()                      
     return
@@ -347,11 +347,11 @@ def list_order(connection, cursor, cid):
         cursor.execute(query, {"oid": oid})
         deliQuery = cursor.fetchone()
         
-        print "Order Number\tTracking Number\tPick Up Time\t Drop Off Time"
-        print oid + "\t" + deliQuery[0] + "\t" + deliQuery[1] + "\t" + deliQuery[2]
+        print ("Order Number\tTracking Number\tPick Up Time\t Drop Off Time")
+        print (oid + "\t" + deliQuery[0] + "\t" + deliQuery[1] + "\t" + deliQuery[2])
         
         # Product Information
-        print "Product\tStore ID\tProduct ID\t Quantity\tUnit\tUnit Price"
+        print ("Product\tStore ID\tProduct ID\t Quantity\tUnit\tUnit Price")
         
         # Count the Number of Product in the Order
         cursor.excute("SELECT count(pid) FROM olines WHERE oid = :oid", {"oid": oid})
@@ -367,7 +367,7 @@ def list_order(connection, cursor, cid):
             cursor.excute(query, {"oid": oid})
             prodQuery = cursor.fetchone()
             
-            print prodQuery[0] + "\t" + prodQuery[1] + "\t"prodQuery[2] + "\t" + prodQuery[3] + "\t" + prodQuery[4] + "\t"prodQuery[5]
+            print (prodQuery[0] + "\t" + prodQuery[1] + "\t"+prodQuery[2] + "\t" + prodQuery[3] + "\t" + prodQuery[4] + "\t"+prodQuery[5])
             
             i += 1   
         

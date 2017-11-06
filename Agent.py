@@ -7,10 +7,10 @@ def agent_main(connection, cursor, aid):
     
     logged_in = True
     while(logged_in):
-        print "1. Set up a delivery"
-        print "2. Update a delivery"
-        print "3. Add to stock"
-        print "Select an option or enter 'q' to log out."
+        print ("1. Set up a delivery")
+        print ("2. Update a delivery")
+        print ("3. Add to stock")
+        print ("Select an option or enter 'q' to log out.")
         choice = input()
         if choice == "q":
             logged_in = False
@@ -21,7 +21,7 @@ def agent_main(connection, cursor, aid):
         elif choice == "3":
             pass #Insert add to stock function here
         else:
-            print "Invalid input. Try again."
+            print ("Invalid input. Try again.")
     
     return
 
@@ -48,10 +48,10 @@ def setup(connection, cursor):
     cursor.execute(query)
     orderList = cursor.fetchall()
     if len(orderList) == 0:
-        print "No orders to setup. Returning to main menu."
+        print ("No orders to setup. Returning to main menu.")
         return
     
-    print "Index\tOrder Id\tCustomer\tOrder date\tAddress"
+    print ("Index\tOrder Id\tCustomer\tOrder date\tAddress")
     #For each order in orderList, print its details and give it an index
     for i in range(len(orderList)):
         query = '''SELECT oid, cid, odate, address
@@ -60,10 +60,10 @@ def setup(connection, cursor):
         '''
         cursor.execute(query, {"oid": orderList[i]})
         result = cursor.fetchone()
-        print i + ".\t" + result[0] + "\t" + result[1] + "\t" + result[2] + "\t" + result[3]    
+        print (i + ".\t" + result[0] + "\t" + result[1] + "\t" + result[2] + "\t" + result[3] )   
     
     #Pick a order
-    print "Select an order using index to add to the delivery. Input 'q' to finish setup for this delivery."
+    print ("Select an order using index to add to the delivery. Input 'q' to finish setup for this delivery.")
     active = True
     while active:
         choice = input()
@@ -85,7 +85,7 @@ def setup(connection, cursor):
                         query = '''INSERT INTO deliveries VALUES (:trackingno, :oid, null, null);'''
                         cursor.execute(query, {"trackingno": trackingno, "oid": orderList[choice]})
                     connection.commit()
-                    print "Order added to delivery!"
+                    print ("Order added to delivery!")
             except ValueError:
-                print "Invalid input. Try again."
+                print ("Invalid input. Try again.")
     return
