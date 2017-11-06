@@ -6,6 +6,7 @@ import time
 import hashlib
 import Customer
 import Agent
+import getpass
 
 connection = None
 cursor = None
@@ -28,7 +29,7 @@ def customer_login():
     print "Enter your customer id:"
     cid = input()
     print "Enter your password:"
-    pwd = input() #TODO invisible implementation
+    pwd = getpass.getpass()
     
     cursor.execute("SELECT * FROM customers WHERE cid = :cid AND pwd = :pwd;",{"cid": cid, "pwd": pwd})
     if(len(cursor.fetchall()) == 1):
@@ -47,7 +48,7 @@ def agent_login():
     print "Enter your agent id:"
     aid = input()
     print "Enter your password:"
-    pwd = input() #TODO invisible implementation
+    pwd = getpass.getpass()
     
     cursor.execute("SELECT * FROM agents WHERE aid = :aid AND pwd = :pwd;",{"aid": aid, "pwd": pwd})
     if(len(cursor.fetchall()) == 1):
@@ -77,7 +78,7 @@ def customer_register():
             print("{0} is not a unique customer id.".format(cid))
     
     print "Enter a password:"
-    pwd = input() #TODO Invisible implementation
+    pwd = getpass.getpass()
     
     cursor.execute("INSERT INTO customers VALUES (:cid, :name, :address, :pwd);", {"cid": cid, "name": name, "address": address, "pwd": pwd})
     connection.commit()
