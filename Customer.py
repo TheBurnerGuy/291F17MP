@@ -54,8 +54,8 @@ def search(connection, cursor, cid):
     #Store the list into a bigger list called listOfMatches
     listOfMatches = list()
     for term in searchTerms:
-        query = "SELECT pid FROM products WHERE name LIKE '%4L%';"
-        cursor.execute(query, {"thing": term.strip()})
+        query = "SELECT pid FROM products WHERE name LIKE '%"+term.strip()+"%';"
+        cursor.execute(query)
         listOfMatches.append(cursor.fetchall())  
     
     #Count the products for each matching term
@@ -112,7 +112,6 @@ def search(connection, cursor, cid):
             thirdQuery = cursor.fetchone()
             
             print (str(indexNumber) + ".\t" + str(firstQuery[0]) + "\t" + str(firstQuery[1]) + "\t" + str(firstQuery[2]) + "\t" + str(firstQuery[3]) + "\t" + str(secondQuery[0]) + "\t" + str(firstQuery[4]) + "\t" + str(secondQuery[1]) + "\t" + str(thirdQuery[0]))
-        
         
         print ("5. Previous Page 6. Next Page 7. Return to menu")
         
