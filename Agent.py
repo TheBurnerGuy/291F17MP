@@ -17,7 +17,7 @@ def agent_main(connection, cursor, aid):
         elif choice == "1":
             setup(connection, cursor)
         elif choice == "2":
-            pass #Insert update a delivery function here
+            update(connection, cursor)
         elif choice == "3":
             add_to_stock(connection, cursor)
         else:
@@ -70,7 +70,7 @@ def setup(connection, cursor):
                 if choice >= 0 and choice < len(orderList):
                     #Change pick up time (or not)
                     if(input("Set up pickup time? (Enter 'y' for yes)") == 'y'):
-                        pickUpTime = input("Enter pick-up time: (e.g. year-month-day hour:minute:second)")
+                        pickUpTime = input("Enter pick-up time (e.g. year-month-day hour:minute:second): ")
                         #Taken from https://stackoverflow.com/questions/12672629/python-how-to-convert-string-into-datetime
                         pickUpTime = datetime.datetime.strptime(pickUpTime, "%Y-%m-%d %H:%M:%S")
                         query = '''INSERT INTO deliveries VALUES (:trackingno, :oid, :pickUpTime, null);'''
@@ -98,15 +98,63 @@ def update(connection, cursor):
         return
     
     #show pickup time
-    delivery = cursor.fetchone()
-    print ("Current pick up time: " + str(delivery[2]))
-    print ("Current drop off time: " + str(delivery[3]))
+    delivery = cursor.fetchall()
     
-    #allow agent to change pickup /drop off time or remove order
-    active = True
-    while(active):
-        active = False
-        decision = input("Enter '1' or")
+    undecided = True
+    while(undecided):
+        print("Index:\tOrder Id\tPick up time\tDrop off time")
+        for i in range(len(delivery)):
+            print (str(i) +"\t"+ str(delivery[i][1])+ "\t" + str(delivery[i][2]) +"\t"+ str(delivery[i][3]))      
+            
+        print("Select an order by index or enter 'q' to return to menu")
+        try:
+            choice = input()
+            if(choice == 'q'):
+                undecided = False
+            elif int(choice) >= 0 and int(choice) < len(delivery):
+                #allow agent to change pickup /drop off time or remove order
+                oid = delivery[int(choice)][1]
+                active = True
+                while(active):
+                    print("1. Change pick up time")
+                    print("2. Change drop off time")
+                    print("3. Remove from delivery")
+                    decision = input("Select a choice or enter 'q' to go back to order list: ")
+                    if decision == "1": #change pickup time
+                        changeTime = input("Enter pick-up time (e.g. year-month-day hour:minute:second): ")
+                        changeTime = datetime.datetime.strptime(changeTime, "%Y-%m-%d %H:%M:%S")
+                        query = '''UPDATE deliveries SET pickUpTime = :changeTime WHERE trackingNo = :trackingNo AND oid = :oid
+                        '''
+                        cursor.execute(query, {"changeTime": changeTime, "trackingNo": trackingNo, "oid":oid})
+                        delivery[int(choice)][2] = changeTime
+                        print("Succesfully changed pick up time!")
+                    elif decision == "2": #change dropoff time
+                        changeTime = input("Enter pick-up time (e.g. year-month-day hour:minute:second): ")
+                        changeTime = datetime.datetime.strptime(changeTime, "%Y-%m-%d %H:%M:%S")
+                        query = '''UPDATE deliveries SET dropOffTime = :changeTime WHERE trackingNo = :trackingNo AND oid = :oid
+                        '''
+                        cursor.execute(query, {"changeTime": changeTime, "trackingNo": trackingNo, "oid":oid})
+                        delivery[int(choice)][3] = changeTime
+                        print("Succesfully changed drop off time!")
+                    elif decision == "3": # delete
+                        query = '''DELETE FROM deliveries WHERE trackingNo = :trackingNo AND oid = :oid
+                        '''
+                        cursor.execute(query, {"trackingNo": trackingNo, "oid":oid})
+                        connection.commit()
+                        delivery.pop(int(choice))
+                        print("Succesfully deleted!")
+                        active = False
+                    elif decision == "q":
+                        active = False
+                    else:
+                        print("Invalid input. Try again.")                
+            else:
+                print("Incorrect input. Try again.")
+        except ValueError:
+            print("Incorrect input. Try again.")
+    
+    connection.commit()
+            
     return
 
 def add_to_stock(connection, cursor):
