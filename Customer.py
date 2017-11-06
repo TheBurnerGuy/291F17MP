@@ -257,10 +257,10 @@ def list_order(connection, cursor, cid):
     
     query = '''SELECT oid
     FROM orders
-    WHERE pid = :pid
+    WHERE cid = :cid
     ORDER BY oid DESC;
     '''
-    cursor.execute(query, {"pid": pid})
+    cursor.execute(query, {"cid": cid})
     # orderList will contain all the oid with the same 
     orderList = cursor.fetchall()
     
@@ -275,6 +275,100 @@ def list_order(connection, cursor, cid):
     active = True
     pageNumber = 1
     while(active):
-    
+        indexNumber = 0
+        print "Order ID\tOrder Date\tNumber of Product\tTotal Price"
+        for i in range((pageNumber-1)*5,min((pageNumber*5)-1, len(orderList))):
+            indexNumber += 1
+            
+            # First query gets the Order Number and Order date
+            query = '''SELECT oid, odate
+            FROM orders
+            WHERE oid = :oid;
+            '''
+            cursor.execute(query, {"oid": orderList[i]})
+            firstQuery = cursor.fetchone()
+            
+            # Second query gets the Number of Product and Total Price
+            query = '''SELECT sum(count(pid) * qty), sum(qty * uprice)
+            FROM olines
+            WHERE oid = :oid;
+            '''
+            cursor.execute(query, {"oid": orderList[i]})
+            secondQuery = cursor.fetchone()
+            
+            print str(indexNumber) + ".\t" + firstQuery[0] + "\t" + firstQuery[1] + "\t" + firstQuery[2] + "\t" + secondQuery[0] + "\t" + secondQuery[1]
+        
+        # Display options based on page number
+        # pageStat: Indicate page based on following condition
+        if pageNumber = 1:
+            print "6. Next Page 7. Return to Menu"
+            pageStat = 1
+        elif pageNumber = (len(orderList)/5):
+            print "5. Previous Page 7. Return to Menu"
+            pageStat = 3
+        else:
+            print "5. Previous Page 6. Next Page 7. Return to menu"
+            pageStat = 2
+        
+        # Chioce Branch
+        undecided = True
+        while undecided:
+            try:
+                numChoice = int(input())
+                undecided = False
+                if(numChoice > 0 and numChoice < 5): #Get detailed description of an order
+                    list_detail(connection, cursor, cid, orderList[((pageNumber - 1)*5) + (numChoice - 1)])
+                
+                elif(numChoice == 5 and pageStat != 1): # Previous page
+                    pageNumber -= 1
+                elif(numChoice == 5 and pageStat != 3): # Next page
+                    pageNumber += 1
+                elif(numChoice == 7): # Go back to menu
+                    active = False
+                else:
+                    print "Invalid input. Try again."
+                    undecided = True
+            except ValueError:
+                print "Invalid input. Try again."
+                
+    cursor.execute()                      
     return
     
+    # Helper function for Listing
+    def list_detail(connection, cursor, cid, oid):
+        # Displays Delivery Infromation: Tracking Number, Pick Up Time, and Drop Off Time
+        # Also, A list of products in the Order, with its: Store ID, Product ID, Quantity, Unit, and Unit Price
+        
+        # Delivery Information
+        query = '''SELECT trackingno, pickUpTime, dropOffTime
+        FROM deliveries
+        WHERE oid = :oid;
+        '''
+        cursor.execute(query, {"oid": oid})
+        deliQuery = cursor.fetchone()
+        
+        print "Order Number\tTracking Number\tPick Up Time\t Drop Off Time"
+        print oid + "\t" + deliQuery[0] + "\t" + deliQuery[1] + "\t" + deliQuery[2]
+        
+        # Product Information
+        print "Product\tStore ID\tProduct ID\t Quantity\tUnit\tUnit Price"
+        
+        # Count the Number of Product in the Order
+        cursor.excute("SELECT count(pid) FROM olines WHERE oid = :oid", {"oid": oid})
+        count = cursor.fetchall()
+        
+        # Create a list with all the pid in the order
+        i = 0
+        for i in range(count - 1):
+            query = '''SELECT products.name, olines.sid, olines.pid, olines.qty, products.unit, olines.uprice
+            FROM products, olines
+            WHERE products.pid = olines.pid AND olines.oid = :oid
+            '''
+            cursor.excute(query, {"oid": oid})
+            prodQuery = cursor.fetchone()
+            
+            print prodQuery[0] + "\t" + prodQuery[1] + "\t"prodQuery[2] + "\t" + prodQuery[3] + "\t" + prodQuery[4] + "\t"prodQuery[5]
+            
+            i += 1   
+        
+        return
