@@ -17,7 +17,7 @@ def agent_main(connection, cursor, aid):
         elif choice == "1":
             setup(connection, cursor)
         elif choice == "2":
-            pass #Insert update a delivery function here
+            update(connection, cursor)
         elif choice == "3":
             pass #Insert add to stock function here
         else:
@@ -126,6 +126,7 @@ def update(connection, cursor):
                         query = '''UPDATE deliveries SET pickUpTime = :changeTime WHERE trackingNo = :trackingNo AND oid = :oid
                         '''
                         cursor.execute(query, {"changeTime": changeTime, "trackingNo": trackingNo, "oid":oid})
+                        delivery[int(choice)][2] = changeTime
                         print("Succesfully changed pick up time!")
                     elif decision == "2": #change dropoff time
                         changeTime = input("Enter pick-up time (e.g. year-month-day hour:minute:second): ")
@@ -133,6 +134,7 @@ def update(connection, cursor):
                         query = '''UPDATE deliveries SET dropOffTime = :changeTime WHERE trackingNo = :trackingNo AND oid = :oid
                         '''
                         cursor.execute(query, {"changeTime": changeTime, "trackingNo": trackingNo, "oid":oid})
+                        delivery[int(choice)][3] = changeTime
                         print("Succesfully changed drop off time!")
                     elif decision == "3": # delete
                         query = '''DELETE FROM deliveries WHERE trackingNo = :trackingNo AND oid = :oid
