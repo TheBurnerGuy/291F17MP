@@ -278,7 +278,7 @@ def list_order(connection, cursor, cid):
     pageNumber = 1
     while(active):
         indexNumber = 0
-        print ("Order ID\tOrder Date\tNumber of Product\tTotal Price")
+        print ("Index\tOrder ID\tOrder Date\tNumber of Product\tTotal Price")
         for i in range((pageNumber-1)*5,min((pageNumber*5)-1, len(orderList))):
             indexNumber += 1
             
@@ -287,22 +287,25 @@ def list_order(connection, cursor, cid):
             FROM orders
             WHERE oid = :oid;
             '''
-            cursor.execute(query, {"oid": orderList[i]})
+            cursor.execute(query, {"oid": orderList[i][0]})
             firstQuery = cursor.fetchone()
             
             # Second query gets the Number of Product and Total Price
-            query = '''SELECT sum(count(pid) * qty), sum(qty * uprice)
+            query = '''SELECT sum(qty), sum(qty * uprice)
             FROM olines
             WHERE oid = :oid;
             '''
-            cursor.execute(query, {"oid": orderList[i]})
+            cursor.execute(query, {"oid": orderList[i][0]})
             secondQuery = cursor.fetchone()
             
-            print (str(indexNumber) + ".\t" + firstQuery[0] + "\t" + firstQuery[1] + "\t" + firstQuery[2] + "\t" + secondQuery[0] + "\t" + secondQuery[1])
+            print (str(indexNumber) + ".\t" + str(firstQuery[0]) + "\t\t" + str(firstQuery[1]) + "\t" + str(secondQuery[0]) + "\t\t\t" + str(secondQuery[1]))
         
         # Display options based on page number
         # pageStat: Indicate page based on following condition
-        if pageNumber == 1:
+        if pageNumber == 1 and ((len(orderList)//5) <= 1):
+            print ("7. Return to Menu")
+            pageStat = 4
+        elif pageNumber == 1:
             print ("6. Next Page 7. Return to Menu")
             pageStat = 1
         elif pageNumber == len(orderList)//5:
@@ -319,11 +322,11 @@ def list_order(connection, cursor, cid):
                 numChoice = int(input())
                 undecided = False
                 if(numChoice > 0 and numChoice < 5): #Get detailed description of an order
-                    list_detail(connection, cursor, cid, orderList[((pageNumber - 1)*5) + (numChoice - 1)])
+                    list_detail(connection, cursor, cid, orderList[((pageNumber - 1)*5) + (numChoice - 1)][0])
                 
-                elif(numChoice == 5 and pageStat != 1): # Previous page
+                elif(numChoice == 5 and pageStat != 1 and pageStat != 4): # Previous page
                     pageNumber -= 1
-                elif(numChoice == 5 and pageStat != 3): # Next page
+                elif(numChoice == 6 and pageStat != 3 and pageStat != 4): # Next page
                     pageNumber += 1
                 elif(numChoice == 7): # Go back to menu
                     active = False
@@ -332,8 +335,7 @@ def list_order(connection, cursor, cid):
                     undecided = True
             except ValueError:
                 print ("Invalid input. Try again.")
-                
-    cursor.execute()                      
+                                    
     return
     
     # Helper function for Listing
@@ -350,26 +352,31 @@ def list_detail(connection, cursor, cid, oid):
         deliQuery = cursor.fetchone()
         
         print ("Order Number\tTracking Number\tPick Up Time\t Drop Off Time")
-        print (oid + "\t" + deliQuery[0] + "\t" + deliQuery[1] + "\t" + deliQuery[2])
+        print (str(oid) + "\t\t" + str(deliQuery[0]) + "\t" + str(deliQuery[1]) + "\t" + str(deliQuery[2]))
         
         # Product Information
         print ("Product\tStore ID\tProduct ID\t Quantity\tUnit\tUnit Price")
         
         # Count the Number of Product in the Order
-        cursor.excute("SELECT count(pid) FROM olines WHERE oid = :oid", {"oid": oid})
-        count = cursor.fetchall()
+        cursor.execute('SELECT count(pid) FROM olines WHERE oid = :oid', {"oid": oid})
+        count = cursor.fetchone()
+        
+        
+        # Fetch the products into a List
+        cursor.execute('SELECT pid FROM olines WHERE oid = :oid', {"oid": oid})
+        prodList = cursor.fetchall()
         
         # Create a list with all the pid in the order
         i = 0
-        for i in range(count - 1):
+        for i in range(int(count[0])):
             query = '''SELECT products.name, olines.sid, olines.pid, olines.qty, products.unit, olines.uprice
             FROM products, olines
-            WHERE products.pid = olines.pid AND olines.oid = :oid
+            WHERE products.pid = :pid AND products.pid = olines.pid;
             '''
-            cursor.excute(query, {"oid": oid})
+            cursor.execute(query, {"pid": prodList[i][0]})
             prodQuery = cursor.fetchone()
             
-            print (prodQuery[0] + "\t" + prodQuery[1] + "\t"+prodQuery[2] + "\t" + prodQuery[3] + "\t" + prodQuery[4] + "\t"+prodQuery[5])
+            print (str(prodQuery[0]) + "\t" + str(prodQuery[1]) + "\t"+ str(prodQuery[2]) + "\t" + str(prodQuery[3]) + "\t" + str(prodQuery[4]) + "\t"+ str(prodQuery[5]))
             
             i += 1   
         
