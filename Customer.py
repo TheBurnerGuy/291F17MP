@@ -24,7 +24,7 @@ def customer_main(connection, cursor, cid):
         elif choice == "1":
             search(connection, cursor, cid)
         elif choice == "2":
-            pass #Insert place an order function here
+            place_order(connection, cursor, cid)
         elif choice == "3":
             list_order(connection, cursor, cid)
         else:
@@ -261,7 +261,7 @@ def place_order(connection, cursor, cid):
     
 	
     connection.commit()
-    
+    return
 
 #Create an Unique Order Number
 def create_oid(connection, cursor):
